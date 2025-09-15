@@ -22,16 +22,19 @@ label.BackgroundTransparency = 1
 label.TextColor3 = Color3.fromRGB(255, 255, 255)
 label.TextScaled = true
 label.Parent = frame
-    local function updateCoordinates()
+
+local function updateCoordinates()
     local player = game.Players.LocalPlayer
     local character = player.Character or player.CharacterAdded:Wait()
     local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
     
     while true do
-        local position = humanoidRootPart.Position
-        label.Text = string.format("X: %.2f, Y: %.2f, Z: %.2f", position.X, position.Y, position.Z)
-        wait(0.000000000001) -- Memperbarui setiap 0.1 detik
+        if humanoidRootPart then
+            local position = humanoidRootPart.Position
+            label.Text = string.format("X: %.2f, Y: %.2f, Z: %.2f", position.X, position.Y, position.Z)
+        end
+        wait(0.1) -- Memperbarui setiap 0.1 detik
     end
 end
 
-spawn(updateCoordinates)
+task.spawn(updateCoordinates)
