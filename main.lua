@@ -150,28 +150,20 @@ logArea.AutomaticCanvasSize = Enum.AutomaticSize.Y
 logArea.CanvasSize = UDim2.new(0, 0, 0, 0)
 
 local function updateLog()
-    task.defer(function()
-        logArea.CanvasPosition = Vector2.new(0, math.max(0, logArea.CanvasSize.Y.Offset - logArea.AbsoluteWindowSize.Y))
-    end)
+    logArea.CanvasPosition = Vector2.new(0, 999999)
 end
 
 -- Logika real-time: Memperbarui log saat posisi berubah
 spawn(function()
-    print("Spawn function started")
     local character = player.Character or player.CharacterAdded:Wait()
-    print("Character loaded")
     local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-    print("HumanoidRootPart found")
 
     while wait(1) do
         if is_logging then
-            print("Logging is active")
             local currentPosition = humanoidRootPart.Position
-            print("Current position:", currentPosition)
             local formattedCoord = string.format("%.2f, %.2f, %.2f", currentPosition.X, currentPosition.Y, currentPosition.Z)
             textLabel.Text = textLabel.Text .. "\n" .. formattedCoord
             updateLog()
-            print("Coordinate added:", formattedCoord)
         end
     end
 end)
