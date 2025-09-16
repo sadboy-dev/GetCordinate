@@ -1,13 +1,11 @@
 --========================================================
--- Script Maker V1 - Roblox Lua
--- Merekam koordinat secara otomatis.
+-- Script Maker V1 - Versi Final yang Diperbaiki
 --========================================================
 
 -- Variabel utama
 local recorded_coords = {}
 local is_recording = false
 local player = game.Players.LocalPlayer
-local recordLoop
 
 -- Membuat GUI di layar
 local screenGui = Instance.new("ScreenGui")
@@ -58,22 +56,9 @@ startBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 startBtn.TextScaled = true
 startBtn.Parent = frame
 startBtn.MouseButton1Click:Connect(function()
-    if not is_recording then
-        is_recording = true
-        logArea.Text = "Merekam..."
-        
-        recordLoop = coroutine.wrap(function()
-            local character = player.Character or player.CharacterAdded:Wait()
-            local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-            
-            while is_recording do
-                local position = humanoidRootPart.Position
-                table.insert(recorded_coords, position)
-                wait(0.1) -- Mengambil koordinat setiap 0.1 detik
-            end
-        end)
-        recordLoop()
-    end
+    print("Tombol Start diklik.") -- Debug
+    is_recording = true
+    logArea.Text = "Merekam..."
 end)
 
 local stopBtn = Instance.new("TextButton")
@@ -85,6 +70,7 @@ stopBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 stopBtn.TextScaled = true
 stopBtn.Parent = frame
 stopBtn.MouseButton1Click:Connect(function()
+    print("Tombol Stop diklik.") -- Debug
     is_recording = false
     logArea.Text = "Perekaman dihentikan."
 end)
@@ -98,6 +84,7 @@ copyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 copyBtn.TextScaled = true
 copyBtn.Parent = frame
 copyBtn.MouseButton1Click:Connect(function()
+    print("Tombol Copy diklik.") -- Debug
     if #recorded_coords > 0 then
         local output = ""
         for i, coord in ipairs(recorded_coords) do
@@ -118,9 +105,8 @@ addCoorBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 addCoorBtn.TextScaled = true
 addCoorBtn.Parent = frame
 addCoorBtn.MouseButton1Click:Connect(function()
-    if is_recording then
-        logArea.Text = "Perekaman otomatis sedang aktif. Tekan 'Stop' untuk menghentikannya."
-    else
+    print("Tombol Add Coor diklik.") -- Debug
+    if not is_recording then
         local character = player.Character or player.CharacterAdded:Wait()
         local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
         if humanoidRootPart then
@@ -128,7 +114,10 @@ addCoorBtn.MouseButton1Click:Connect(function()
             table.insert(recorded_coords, position)
             local last_coord = recorded_coords[#recorded_coords]
             logArea.Text = "Koordinat ditambahkan:\n" .. string.format("%.2f, %.2f, %.2f", last_coord.X, last_coord.Y, last_coord.Z)
+            print("Koordinat manual ditambahkan:", last_coord) -- Debug
         end
+    else
+        logArea.Text = "Perekaman otomatis sedang aktif."
     end
 end)
 
@@ -141,6 +130,7 @@ clearBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 clearBtn.TextScaled = true
 clearBtn.Parent = frame
 clearBtn.MouseButton1Click:Connect(function()
+    print("Tombol Clear diklik.") -- Debug
     recorded_coords = {}
     logArea.Text = "Semua koordinat telah dihapus."
 end)
@@ -159,3 +149,19 @@ logArea.Font = Enum.Font.SourceSans
 logArea.TextSize = 14
 logArea.ClearTextOnFocus = false
 logArea.Parent = frame
+
+-- Loop perekaman yang akan berjalan di latar belakang
+while wait() do
+    if is_recording then
+        local character = player.Character
+        if character then
+            local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+            if humanoidRootPart then
+                -- Menambahkan koordinat ke tabel setiap 0.1 detik
+                table.insert(recorded_coords, humanoidRootPart.Position)
+                -- Memperbarui teks log dengan jumlah koordinat yang sudah direkam
+                logArea.Text = "Merekam... Total: " .. #recorded_coords .. " koordinat"
+            end
+        end
+    end
+end
