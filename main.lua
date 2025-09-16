@@ -119,21 +119,28 @@ teleportBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 teleportBtn.TextScaled = true
 teleportBtn.Parent = frame
 teleportBtn.MouseButton1Click:Connect(function()
+    print("Teleport button clicked")
     local x = tonumber(xInput.Text)
     local y = tonumber(yInput.Text)
     local z = tonumber(zInput.Text)
+    print("Parsed coordinates:", x, y, z)
     if x and y and z then
         local character = player.Character or player.CharacterAdded:Wait()
+        print("Character found:", character)
         local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
         if humanoidRootPart then
+            print("Setting position to:", x, y, z)
             humanoidRootPart.Position = Vector3.new(x, y, z)
+            print("Position set")
             textLabel.Text = textLabel.Text .. "\nTeleported to: " .. string.format("%.2f, %.2f, %.2f", x, y, z)
             updateLog()
         else
+            print("HumanoidRootPart not found")
             textLabel.Text = textLabel.Text .. "\nError: HumanoidRootPart not found"
             updateLog()
         end
     else
+        print("Invalid coordinates")
         textLabel.Text = textLabel.Text .. "\nError: Invalid coordinates"
         updateLog()
     end
