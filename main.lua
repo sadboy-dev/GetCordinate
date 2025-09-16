@@ -57,7 +57,8 @@ startBtn.TextScaled = true
 startBtn.Parent = frame
 startBtn.MouseButton1Click:Connect(function()
     is_logging = true
-    logArea.Text = "Mulai logging..."
+    textLabel.Text = "Mulai logging..."
+    updateLog()
 end)
 
 local stopBtn = Instance.new("TextButton")
@@ -70,7 +71,8 @@ stopBtn.TextScaled = true
 stopBtn.Parent = frame
 stopBtn.MouseButton1Click:Connect(function()
     is_logging = false
-    logArea.Text = logArea.Text .. "\nLogging dihentikan."
+    textLabel.Text = textLabel.Text .. "\nLogging dihentikan."
+    updateLog()
 end)
 
 local copyBtn = Instance.new("TextButton")
@@ -82,9 +84,8 @@ copyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 copyBtn.TextScaled = true
 copyBtn.Parent = frame
 copyBtn.MouseButton1Click:Connect(function()
-    -- Mengatur properti TextBox agar dapat dipilih
-    logArea.TextSelectable = true
-    logArea.PlaceholderText = "Sekarang Anda dapat menyalin teks ini."
+    -- Mengatur properti TextLabel agar dapat dipilih
+    textLabel.TextSelectable = true
 end)
 
 local addCoorBtn = Instance.new("TextButton")
@@ -97,16 +98,17 @@ addCoorBtn.TextScaled = true
 addCoorBtn.Parent = frame
 addCoorBtn.MouseButton1Click:Connect(function()
     if not is_logging then
-        logArea.Text = logArea.Text .. "\n(Tambahkan koordinat secara manual)"
+        textLabel.Text = textLabel.Text .. "\n(Tambahkan koordinat secara manual)"
         local character = player.Character or player.CharacterAdded:Wait()
         local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
         if humanoidRootPart then
             local position = humanoidRootPart.Position
-            logArea.Text = logArea.Text .. "\n" .. string.format("%.2f, %.2f, %.2f", position.X, position.Y, position.Z)
+            textLabel.Text = textLabel.Text .. "\n" .. string.format("%.2f, %.2f, %.2f", position.X, position.Y, position.Z)
         end
     else
-        logArea.Text = logArea.Text .. "\n(Perekaman real-time sedang aktif)"
+        textLabel.Text = textLabel.Text .. "\n(Perekaman real-time sedang aktif)"
     end
+    updateLog()
 end)
 
 local clearBtn = Instance.new("TextButton")
@@ -118,23 +120,37 @@ clearBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 clearBtn.TextScaled = true
 clearBtn.Parent = frame
 clearBtn.MouseButton1Click:Connect(function()
-    logArea.Text = "Log telah dihapus."
+    textLabel.Text = "Log telah dihapus."
+    updateLog()
 end)
 
 -- Area log untuk menampilkan teks
-local logArea = Instance.new("TextBox")
+local logArea = Instance.new("ScrollingFrame")
 logArea.Size = UDim2.new(0.9, 0, 0.4, 0)
 logArea.Position = UDim2.new(0.05, 0, 0.55, 0)
-logArea.Text = "Tekan 'Start' untuk mulai merekam koordinat."
 logArea.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-logArea.TextColor3 = Color3.fromRGB(255, 255, 255)
-logArea.MultiLine = true
-logArea.TextWrapped = true
-logArea.TextScaled = false
-logArea.Font = Enum.Font.SourceSans
-logArea.TextSize = 14
-logArea.ClearTextOnFocus = false
+logArea.ScrollBarThickness = 8
 logArea.Parent = frame
+
+local textLabel = Instance.new("TextLabel")
+textLabel.Size = UDim2.new(1, 0, 1, 0)
+textLabel.Position = UDim2.new(0, 0, 0, 0)
+textLabel.Text = ""
+textLabel.BackgroundTransparency = 1
+textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+textLabel.TextWrapped = true
+textLabel.TextScaled = false
+textLabel.Font = Enum.Font.SourceSans
+textLabel.TextSize = 14
+textLabel.TextXAlignment = Enum.TextXAlignment.Left
+textLabel.TextYAlignment = Enum.TextYAlignment.Top
+textLabel.Parent = logArea
+
+local function updateLog()
+    textLabel.Size = UDim2.new(1, 0, 0, textLabel.TextBounds.Y)
+    logArea.CanvasSize = UDim2.new(0, 0, 0, textLabel.TextBounds.Y)
+    logArea.CanvasPosition = Vector2.new(0, math.max(0, logArea.CanvasSize.Y.Offset - logArea.AbsoluteWindowSize.Y))
+end
 
 -- Logika real-time: Memperbarui log saat posisi berubah
 spawn(function()
@@ -147,7 +163,8 @@ spawn(function()
             -- Tambahkan koordinat hanya jika posisinya berubah
             if not lastPosition or (currentPosition - lastPosition).Magnitude > 0.1 then
                 local formattedCoord = string.format("%.2f, %.2f, %.2f", currentPosition.X, currentPosition.Y, currentPosition.Z)
-                logArea.Text = logArea.Text .. "\n" .. formattedCoord
+                textLabel.Text = textLabel.Text .. "\n" .. formattedCoord
+                updateLog()
                 lastPosition = currentPosition
             end
         end
