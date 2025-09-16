@@ -110,6 +110,35 @@ addCoorBtn.MouseButton1Click:Connect(function()
     updateLog()
 end)
 
+local teleportBtn = Instance.new("TextButton")
+teleportBtn.Size = UDim2.new(0.25, 0, 0.15, 0)
+teleportBtn.Position = UDim2.new(0.65, 0, 0.35, 0)
+teleportBtn.Text = "Teleport"
+teleportBtn.BackgroundColor3 = Color3.fromRGB(100, 200, 100)
+teleportBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+teleportBtn.TextScaled = true
+teleportBtn.Parent = frame
+teleportBtn.MouseButton1Click:Connect(function()
+    local x = tonumber(xInput.Text)
+    local y = tonumber(yInput.Text)
+    local z = tonumber(zInput.Text)
+    if x and y and z then
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+        if humanoidRootPart then
+            humanoidRootPart.Position = Vector3.new(x, y, z)
+            textLabel.Text = textLabel.Text .. "\nTeleported to: " .. string.format("%.2f, %.2f, %.2f", x, y, z)
+            updateLog()
+        else
+            textLabel.Text = textLabel.Text .. "\nError: HumanoidRootPart not found"
+            updateLog()
+        end
+    else
+        textLabel.Text = textLabel.Text .. "\nError: Invalid coordinates"
+        updateLog()
+    end
+end)
+
 local clearBtn = Instance.new("TextButton")
 clearBtn.Size = UDim2.new(0.25, 0, 0.15, 0)
 clearBtn.Position = UDim2.new(0.35, 0, 0.35, 0)
@@ -122,6 +151,40 @@ clearBtn.MouseButton1Click:Connect(function()
     textLabel.Text = "Log telah dihapus."
     updateLog()
 end)
+
+-- Input koordinat untuk teleport
+local xInput = Instance.new("TextBox")
+xInput.Size = UDim2.new(0.25, 0, 0.08, 0)
+xInput.Position = UDim2.new(0.05, 0, 0.45, 0)
+xInput.PlaceholderText = "X"
+xInput.Text = ""
+xInput.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
+xInput.TextColor3 = Color3.fromRGB(0, 0, 0)
+xInput.Font = Enum.Font.SourceSans
+xInput.TextSize = 14
+xInput.Parent = frame
+
+local yInput = Instance.new("TextBox")
+yInput.Size = UDim2.new(0.25, 0, 0.08, 0)
+yInput.Position = UDim2.new(0.35, 0, 0.45, 0)
+yInput.PlaceholderText = "Y"
+yInput.Text = ""
+yInput.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
+yInput.TextColor3 = Color3.fromRGB(0, 0, 0)
+yInput.Font = Enum.Font.SourceSans
+yInput.TextSize = 14
+yInput.Parent = frame
+
+local zInput = Instance.new("TextBox")
+zInput.Size = UDim2.new(0.25, 0, 0.08, 0)
+zInput.Position = UDim2.new(0.65, 0, 0.45, 0)
+zInput.PlaceholderText = "Z"
+zInput.Text = ""
+zInput.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
+zInput.TextColor3 = Color3.fromRGB(0, 0, 0)
+zInput.Font = Enum.Font.SourceSans
+zInput.TextSize = 14
+zInput.Parent = frame
 
 -- Area log untuk menampilkan teks
 local logArea = Instance.new("ScrollingFrame")
