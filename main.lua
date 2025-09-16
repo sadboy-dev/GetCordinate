@@ -4,7 +4,6 @@
 
 -- Variabel utama
 local player = game.Players.LocalPlayer
-local lastPosition = nil
 local is_logging = false
 
 -- Membuat GUI di layar
@@ -164,24 +163,15 @@ spawn(function()
     local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
     print("HumanoidRootPart found")
 
-    while wait(0.05) do
+    while wait(1) do
         if is_logging then
             print("Logging is active")
             local currentPosition = humanoidRootPart.Position
             print("Current position:", currentPosition)
-            -- Tambahkan koordinat hanya jika posisinya berubah
-            if not lastPosition or (currentPosition - lastPosition).Magnitude > 0.1 then
-                print("Position changed")
-                local formattedCoord = string.format("%.2f, %.2f, %.2f", currentPosition.X, currentPosition.Y, currentPosition.Z)
-                textLabel.Text = textLabel.Text .. "\n" .. formattedCoord
-                updateLog()
-                lastPosition = currentPosition
-                print("Coordinate added:", formattedCoord)
-            else
-                print("Position not changed enough")
-            end
-        else
-            print("Logging not active")
+            local formattedCoord = string.format("%.2f, %.2f, %.2f", currentPosition.X, currentPosition.Y, currentPosition.Z)
+            textLabel.Text = textLabel.Text .. "\n" .. formattedCoord
+            updateLog()
+            print("Coordinate added:", formattedCoord)
         end
     end
 end)
