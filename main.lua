@@ -1,5 +1,5 @@
 --========================================================
--- Script Maker V1 - Log Koordinat dengan Auto-Scroll
+-- Script Maker V1 - Final Fix
 --========================================================
 
 -- Variabel utama
@@ -7,7 +7,7 @@ local player = game.Players.LocalPlayer
 local lastPosition = nil
 local is_logging = false
 
--- Membuat GUI di layar
+-- Membuat GUI utama
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "ScriptMakerV1Gui"
 screenGui.Parent = player:WaitForChild("PlayerGui")
@@ -22,7 +22,6 @@ frame.Active = true
 frame.Draggable = true
 frame.Parent = screenGui
 
--- Menambahkan judul dan tombol tutup
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(0.8, 0, 0.1, 0)
 title.Position = UDim2.new(0, 0, 0, 0)
@@ -43,10 +42,11 @@ closeBtn.TextScaled = true
 closeBtn.Font = Enum.Font.SourceSansBold
 closeBtn.Parent = frame
 closeBtn.MouseButton1Click:Connect(function()
-	frame:Destroy()
+    is_logging = false
+    frame:Destroy()
 end)
 
--- Menambahkan tombol fungsional
+-- Tombol Fungsional
 local startBtn = Instance.new("TextButton")
 startBtn.Size = UDim2.new(0.25, 0, 0.15, 0)
 startBtn.Position = UDim2.new(0.05, 0, 0.15, 0)
@@ -56,8 +56,8 @@ startBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 startBtn.TextScaled = true
 startBtn.Parent = frame
 startBtn.MouseButton1Click:Connect(function()
-	logArea.Text = "Mulai logging..." -- Membersihkan log saat tombol Start dipencet
-	is_logging = true
+    is_logging = true
+    logArea.Text = "Mulai logging..."
 end)
 
 local stopBtn = Instance.new("TextButton")
@@ -69,8 +69,8 @@ stopBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 stopBtn.TextScaled = true
 stopBtn.Parent = frame
 stopBtn.MouseButton1Click:Connect(function()
-	is_logging = false
-	logArea.Text = logArea.Text .. "\nLogging dihentikan."
+    is_logging = false
+    logArea.Text = logArea.Text .. "\nLogging dihentikan."
 end)
 
 local copyBtn = Instance.new("TextButton")
@@ -82,8 +82,8 @@ copyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 copyBtn.TextScaled = true
 copyBtn.Parent = frame
 copyBtn.MouseButton1Click:Connect(function()
-	logArea.TextSelectable = true
-	logArea.PlaceholderText = "Sekarang Anda dapat menyalin teks ini."
+    logArea.TextSelectable = true
+    logArea.PlaceholderText = "Sekarang Anda dapat menyalin teks ini."
 end)
 
 local addCoorBtn = Instance.new("TextButton")
@@ -95,17 +95,17 @@ addCoorBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 addCoorBtn.TextScaled = true
 addCoorBtn.Parent = frame
 addCoorBtn.MouseButton1Click:Connect(function()
-	if not is_logging then
-		logArea.Text = logArea.Text .. "\n(Tambahkan koordinat secara manual)"
-		local character = player.Character or player.CharacterAdded:Wait()
-		local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
-		if humanoidRootPart then
-			local position = humanoidRootPart.Position
-			logArea.Text = logArea.Text .. "\n" .. string.format("%.2f, %.2f, %.2f", position.X, position.Y, position.Z)
-		end
-	else
-		logArea.Text = logArea.Text .. "\n(Perekaman real-time sedang aktif)"
-	end
+    if not is_logging then
+        logArea.Text = logArea.Text .. "\n(Tambahkan koordinat manual)"
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+        if humanoidRootPart then
+            local position = humanoidRootPart.Position
+            logArea.Text = logArea.Text .. "\n" .. string.format("%.2f, %.2f, %.2f", position.X, position.Y, position.Z)
+        end
+    else
+        logArea.Text = logArea.Text .. "\n(Perekaman real-time sedang aktif)"
+    end
 end)
 
 local clearBtn = Instance.new("TextButton")
@@ -117,13 +117,20 @@ clearBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 clearBtn.TextScaled = true
 clearBtn.Parent = frame
 clearBtn.MouseButton1Click:Connect(function()
-	logArea.Text = "Log telah dihapus."
+    logArea.Text = ""
 end)
 
--- Area log untuk menampilkan teks
+-- Kontainer untuk log area dengan auto-scroll
+local scrollingFrame = Instance.new("ScrollingFrame")
+scrollingFrame.Size = UDim2.new(0.9, 0, 0.4, 0)
+scrollingFrame.Position = UDim2.new(0.05, 0, 0.55, 0)
+scrollingFrame.BackgroundTransparency = 1
+scrollingFrame.BorderSizePixel = 0
+scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+scrollingFrame.Parent = frame
+
 local logArea = Instance.new("TextBox")
-logArea.Size = UDim2.new(0.9, 0, 0.4, 0)
-logArea.Position = UDim2.new(0.05, 0, 0.55, 0)
+logArea.Size = UDim2.new(1, -20, 1, 0) -- Lebar sedikit lebih kecil dari frame
 logArea.Text = "Tekan 'Start' untuk mulai merekam koordinat."
 logArea.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 logArea.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -133,35 +140,26 @@ logArea.TextScaled = false
 logArea.Font = Enum.Font.SourceSans
 logArea.TextSize = 14
 logArea.ClearTextOnFocus = false
-logArea.Parent = frame
+logArea.TextSelectable = false
+logArea.Parent = scrollingFrame
 
--- Tambahan: ScrollBar untuk logArea
-local scrollBar = Instance.new("ScrollingFrame")
-scrollBar.BackgroundTransparency = 1
-scrollBar.Size = UDim2.new(1, 0, 1, 0)
-scrollBar.CanvasSize = UDim2.new(0, 0, 0, 0)
-scrollBar.Parent = logArea
-
-logArea.Text = "" -- Memastikan teks awal kosong
-
--- Loop logika real-time untuk memperbarui log
+-- Loop logika real-time
 spawn(function()
-	local character = player.Character or player.CharacterAdded:Wait()
-	local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+    
+    while wait(0.05) do
+        if is_logging then
+            local currentPosition = humanoidRootPart.Position
+            if not lastPosition or (currentPosition - lastPosition).Magnitude > 0.1 then
+                local formattedCoord = string.format("%.2f, %.2f, %.2f", currentPosition.X, currentPosition.Y, currentPosition.Z)
+                logArea.Text = logArea.Text .. "\n" .. formattedCoord
+                lastPosition = currentPosition
 
-	while wait(0.05) do
-		if is_logging then
-			local currentPosition = humanoidRootPart.Position
-			-- Tambahkan koordinat hanya jika posisinya berubah
-			if not lastPosition or (currentPosition - lastPosition).Magnitude > 0.1 then
-				local formattedCoord = string.format("%.2f, %.2f, %.2f", currentPosition.X, currentPosition.Y, currentPosition.Z)
-				logArea.Text = logArea.Text .. "\n" .. formattedCoord
-				lastPosition = currentPosition
-				
-				-- Auto-scroll
-				scrollBar.CanvasSize = UDim2.new(0, 0, 0, logArea.TextBounds.Y)
-				scrollBar.CanvasPosition = Vector2.new(0, scrollBar.CanvasSize.Y.Offset)
-			end
-		end
-	end
+                -- Auto-scroll
+                scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, logArea.TextBounds.Y)
+                scrollingFrame.CanvasPosition = Vector2.new(0, scrollingFrame.CanvasSize.Y.Offset)
+            end
+        end
+    end
 end)
