@@ -1,11 +1,11 @@
 --========================================================
--- Script Maker V1 - Versi Final yang Diperbaiki
+-- Script Maker V1 - Log Koordinat Real-time
 --========================================================
 
 -- Variabel utama
-local recorded_coords = {}
-local is_recording = false
 local player = game.Players.LocalPlayer
+local lastPosition = nil
+local is_logging = false
 
 -- Membuat GUI di layar
 local screenGui = Instance.new("ScreenGui")
@@ -56,9 +56,8 @@ startBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 startBtn.TextScaled = true
 startBtn.Parent = frame
 startBtn.MouseButton1Click:Connect(function()
-    print("Tombol Start diklik.") -- Debug
-    is_recording = true
-    logArea.Text = "Merekam..."
+    is_logging = true
+    logArea.Text = "Mulai logging..."
 end)
 
 local stopBtn = Instance.new("TextButton")
@@ -70,9 +69,8 @@ stopBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 stopBtn.TextScaled = true
 stopBtn.Parent = frame
 stopBtn.MouseButton1Click:Connect(function()
-    print("Tombol Stop diklik.") -- Debug
-    is_recording = false
-    logArea.Text = "Perekaman dihentikan."
+    is_logging = false
+    logArea.Text = logArea.Text .. "\nLogging dihentikan."
 end)
 
 local copyBtn = Instance.new("TextButton")
@@ -84,16 +82,9 @@ copyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 copyBtn.TextScaled = true
 copyBtn.Parent = frame
 copyBtn.MouseButton1Click:Connect(function()
-    print("Tombol Copy diklik.") -- Debug
-    if #recorded_coords > 0 then
-        local output = ""
-        for i, coord in ipairs(recorded_coords) do
-            output = output .. string.format("%.2f, %.2f, %.2f\n", coord.X, coord.Y, coord.Z)
-        end
-        logArea.Text = output
-    else
-        logArea.Text = "Tidak ada koordinat yang terekam."
-    end
+    -- Mengatur properti TextBox agar dapat dipilih
+    logArea.TextSelectable = true
+    logArea.PlaceholderText = "Sekarang Anda dapat menyalin teks ini."
 end)
 
 local addCoorBtn = Instance.new("TextButton")
@@ -105,19 +96,16 @@ addCoorBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 addCoorBtn.TextScaled = true
 addCoorBtn.Parent = frame
 addCoorBtn.MouseButton1Click:Connect(function()
-    print("Tombol Add Coor diklik.") -- Debug
-    if not is_recording then
+    if not is_logging then
+        logArea.Text = logArea.Text .. "\n(Tambahkan koordinat secara manual)"
         local character = player.Character or player.CharacterAdded:Wait()
         local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
         if humanoidRootPart then
             local position = humanoidRootPart.Position
-            table.insert(recorded_coords, position)
-            local last_coord = recorded_coords[#recorded_coords]
-            logArea.Text = "Koordinat ditambahkan:\n" .. string.format("%.2f, %.2f, %.2f", last_coord.X, last_coord.Y, last_coord.Z)
-            print("Koordinat manual ditambahkan:", last_coord) -- Debug
+            logArea.Text = logArea.Text .. "\n" .. string.format("%.2f, %.2f, %.2f", position.X, position.Y, position.Z)
         end
     else
-        logArea.Text = "Perekaman otomatis sedang aktif."
+        logArea.Text = logArea.Text .. "\n(Perekaman real-time sedang aktif)"
     end
 end)
 
@@ -130,9 +118,7 @@ clearBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 clearBtn.TextScaled = true
 clearBtn.Parent = frame
 clearBtn.MouseButton1Click:Connect(function()
-    print("Tombol Clear diklik.") -- Debug
-    recorded_coords = {}
-    logArea.Text = "Semua koordinat telah dihapus."
+    logArea.Text = "Log telah dihapus."
 end)
 
 -- Area log untuk menampilkan teks
@@ -150,18 +136,20 @@ logArea.TextSize = 14
 logArea.ClearTextOnFocus = false
 logArea.Parent = frame
 
--- Loop perekaman yang akan berjalan di latar belakang
-while wait() do
-    if is_recording then
-        local character = player.Character
-        if character then
-            local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
-            if humanoidRootPart then
-                -- Menambahkan koordinat ke tabel setiap 0.1 detik
-                table.insert(recorded_coords, humanoidRootPart.Position)
-                -- Memperbarui teks log dengan jumlah koordinat yang sudah direkam
-                logArea.Text = "Merekam... Total: " .. #recorded_coords .. " koordinat"
+-- Logika real-time: Memperbarui log saat posisi berubah
+spawn(function()
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+    
+    while wait(0.05) do
+        if is_logging then
+            local currentPosition = humanoidRootPart.Position
+            -- Tambahkan koordinat hanya jika posisinya berubah
+            if not lastPosition or (currentPosition - lastPosition).Magnitude > 0.1 then
+                local formattedCoord = string.format("%.2f, %.2f, %.2f", currentPosition.X, currentPosition.Y, currentPosition.Z)
+                logArea.Text = logArea.Text .. "\n" .. formattedCoord
+                lastPosition = currentPosition
             end
         end
     end
-end
+end)
