@@ -133,7 +133,7 @@ logArea.ScrollBarThickness = 8
 logArea.Parent = frame
 
 local textLabel = Instance.new("TextLabel")
-textLabel.Size = UDim2.new(1, 0, 1, 0)
+textLabel.Size = UDim2.new(1, 0, 0, 0)
 textLabel.Position = UDim2.new(0, 0, 0, 0)
 textLabel.Text = ""
 textLabel.BackgroundTransparency = 1
@@ -144,29 +144,44 @@ textLabel.Font = Enum.Font.SourceSans
 textLabel.TextSize = 14
 textLabel.TextXAlignment = Enum.TextXAlignment.Left
 textLabel.TextYAlignment = Enum.TextYAlignment.Top
+textLabel.AutomaticSize = Enum.AutomaticSize.Y
 textLabel.Parent = logArea
 
+logArea.AutomaticCanvasSize = Enum.AutomaticSize.Y
+logArea.CanvasSize = UDim2.new(0, 0, 0, 0)
+
 local function updateLog()
-    textLabel.Size = UDim2.new(1, 0, 0, textLabel.TextBounds.Y)
-    logArea.CanvasSize = UDim2.new(0, 0, 0, textLabel.TextBounds.Y)
-    logArea.CanvasPosition = Vector2.new(0, math.max(0, logArea.CanvasSize.Y.Offset - logArea.AbsoluteWindowSize.Y))
+    task.defer(function()
+        logArea.CanvasPosition = Vector2.new(0, math.max(0, logArea.CanvasSize.Y.Offset - logArea.AbsoluteWindowSize.Y))
+    end)
 end
 
 -- Logika real-time: Memperbarui log saat posisi berubah
 spawn(function()
+    print("Spawn function started")
     local character = player.Character or player.CharacterAdded:Wait()
+    print("Character loaded")
     local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-    
+    print("HumanoidRootPart found")
+
     while wait(0.05) do
         if is_logging then
+            print("Logging is active")
             local currentPosition = humanoidRootPart.Position
+            print("Current position:", currentPosition)
             -- Tambahkan koordinat hanya jika posisinya berubah
             if not lastPosition or (currentPosition - lastPosition).Magnitude > 0.1 then
+                print("Position changed")
                 local formattedCoord = string.format("%.2f, %.2f, %.2f", currentPosition.X, currentPosition.Y, currentPosition.Z)
                 textLabel.Text = textLabel.Text .. "\n" .. formattedCoord
                 updateLog()
                 lastPosition = currentPosition
+                print("Coordinate added:", formattedCoord)
+            else
+                print("Position not changed enough")
             end
+        else
+            print("Logging not active")
         end
     end
 end)
