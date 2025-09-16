@@ -154,16 +154,17 @@ local function updateLog()
 end
 
 -- Logika real-time: Memperbarui log saat posisi berubah
-spawn(function()
+task.spawn(function()
     local character = player.Character or player.CharacterAdded:Wait()
     local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
 
-    while wait(1) do
+    while task.wait(1) do
         if is_logging then
             local currentPosition = humanoidRootPart.Position
             local formattedCoord = string.format("%.2f, %.2f, %.2f", currentPosition.X, currentPosition.Y, currentPosition.Z)
             textLabel.Text = textLabel.Text .. "\n" .. formattedCoord
             updateLog()
+            print("Coord logged:", formattedCoord)
         end
     end
 end)
