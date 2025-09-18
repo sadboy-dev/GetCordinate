@@ -12,6 +12,8 @@ local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "TeleportGui"
 screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
+local isMinimized = false
+
 local mainFrame = Instance.new("Frame")
 mainFrame.Size = UDim2.new(0, 200, 0, 300)
 mainFrame.Position = UDim2.new(1, -210, 0.5, -150)
@@ -41,6 +43,27 @@ closeBtn.Font = Enum.Font.SourceSansBold
 closeBtn.Parent = mainFrame
 closeBtn.MouseButton1Click:Connect(function()
     mainFrame.Visible = not mainFrame.Visible
+end)
+
+local minimizeBtn = Instance.new("TextButton")
+minimizeBtn.Size = UDim2.new(0, 20, 0, 20)
+minimizeBtn.Position = UDim2.new(1, -44, 0, 2)
+minimizeBtn.Text = "-"
+minimizeBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+minimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+minimizeBtn.Font = Enum.Font.SourceSansBold
+minimizeBtn.Parent = mainFrame
+minimizeBtn.MouseButton1Click:Connect(function()
+    isMinimized = not isMinimized
+    if isMinimized then
+        mainFrame.Size = UDim2.new(0, 200, 0, 30)
+        scrollingFrame.Visible = false
+        minimizeBtn.Text = "+"
+    else
+        mainFrame.Size = UDim2.new(0, 200, 0, 300)
+        scrollingFrame.Visible = true
+        minimizeBtn.Text = "-"
+    end
 end)
 
 local scrollingFrame = Instance.new("ScrollingFrame")
