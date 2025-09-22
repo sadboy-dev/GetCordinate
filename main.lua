@@ -24,11 +24,7 @@ local CP0to1 = {
 }
 
 routes = {
-    {"CP0 → CP1", CP0to1},
-    {"CP1 → CP2", CP1to2},
-    {"CP2 → CP3", CP2to3},
-    {"CP3 → CP4", CP3to4},
-    {"CP4 → CP5", CP4to5},
+    {"CP0 → CP1", CP0to1}
 }
 
 local function getNearestRoute()
