@@ -1,290 +1,237 @@
+-- ===================================
+-- Skrip GUI "Script Maker V1"
+-- =s=================================
+
+-- Layanan dan objek yang diperlukan
 local Players = game:GetService("Players")
-local player = Players.LocalPlayer
-local hrp = nil
+local RunService = game:GetService("RunService")
+local Player = Players.LocalPlayer
+local PlayerGui = Player:WaitForChild("PlayerGui")
 
-local function refreshHRP(char)
-    if not char then
-        char = player.Character or player.CharacterAdded:Wait()
-    end
-    hrp = char:WaitForChild("HumanoidRootPart")
-end
-if player.Character then refreshHRP(player.Character) end
-player.CharacterAdded:Connect(refreshHRP)
+-- Variabel status
+local isRecording = false
+local connection = nil
+local recordedCoordinates = {}
 
-local frameTime = 1/30
-local playbackRate = 1.0
-local isRunning = false
-local routes = {}
+-- Membuat ScreenGui
+local ScriptMakerGui = Instance.new("ScreenGui")
+ScriptMakerGui.Name = "ScriptMakerV1"
+ScriptMakerGui.Parent = PlayerGui
 
+-- Membuat Frame utama
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 300, 0, 350)
+MainFrame.Position = UDim2.new(0.5, -150, 0.5, -175)
+MainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+MainFrame.BorderSizePixel = 2
+MainFrame.BorderColor3 = Color3.fromRGB(25, 25, 25)
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScriptMakerGui
 
-local CP0to1 = {
-    CFrame.new(-591.39, 741.01, 212.39) * CFrame.Angles(0,0,0),
-}
+-- Membuat Judul
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Size = UDim2.new(1, 0, 0, 30)
+TitleLabel.Position = UDim2.new(0, 0, 0, 0)
+TitleLabel.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+TitleLabel.BorderSizePixel = 0
+TitleLabel.TextColor3 = Color3.new(1, 1, 1)
+TitleLabel.Font = Enum.Font.SourceSansBold
+TitleLabel.TextSize = 18
+TitleLabel.Text = "Script Maker V1"
+TitleLabel.Parent = MainFrame
 
-routes = {
-    {"CP0 → CP1", CP0to1}
-}
+-- Membuat Tombol "Close"
+local CloseButton = Instance.new("TextButton")
+CloseButton.Size = UDim2.new(0, 60, 0, 30)
+CloseButton.Position = UDim2.new(1, -60, 0, 0)
+CloseButton.BackgroundColor3 = Color3.fromRGB(220, 50, 50)
+CloseButton.BorderSizePixel = 0
+CloseButton.TextColor3 = Color3.new(1, 1, 1)
+CloseButton.Font = Enum.Font.SourceSansBold
+CloseButton.TextSize = 18
+CloseButton.Text = "Close"
+CloseButton.Parent = MainFrame
 
-local function getNearestRoute()
-    local nearestIdx, dist = 1, math.huge
-    if hrp then
-        local pos = hrp.Position
-        for i,data in ipairs(routes) do
-            for _,cf in ipairs(data[2]) do
-                local d = (cf.Position - pos).Magnitude
-                if d < dist then
-                    dist = d
-                    nearestIdx = i
-                end
-            end
+-- Membuat Tombol "Start"
+local StartButton = Instance.new("TextButton")
+StartButton.Size = UDim2.new(0, 80, 0, 40)
+StartButton.Position = UDim2.new(0, 15, 0, 45)
+StartButton.BackgroundColor3 = Color3.fromRGB(50, 100, 200)
+StartButton.BorderSizePixel = 0
+StartButton.TextColor3 = Color3.new(1, 1, 1)
+StartButton.Font = Enum.Font.SourceSansBold
+StartButton.TextSize = 18
+StartButton.Text = "Start"
+StartButton.Parent = MainFrame
+
+-- Membuat Tombol "Stop"
+local StopButton = Instance.new("TextButton")
+StopButton.Size = UDim2.new(0, 80, 0, 40)
+StopButton.Position = UDim2.new(0, 105, 0, 45)
+StopButton.BackgroundColor3 = Color3.fromRGB(255, 170, 0)
+StopButton.BorderSizePixel = 0
+StopButton.TextColor3 = Color3.new(1, 1, 1)
+StopButton.Font = Enum.Font.SourceSansBold
+StopButton.TextSize = 18
+StopButton.Text = "Stop"
+StopButton.Parent = MainFrame
+
+-- Membuat Tombol "Copy"
+local CopyButton = Instance.new("TextButton")
+CopyButton.Size = UDim2.new(0, 80, 0, 40)
+CopyButton.Position = UDim2.new(0, 195, 0, 45)
+CopyButton.BackgroundColor3 = Color3.fromRGB(50, 200, 50)
+CopyButton.BorderSizePixel = 0
+CopyButton.TextColor3 = Color3.new(1, 1, 1)
+CopyButton.Font = Enum.Font.SourceSansBold
+CopyButton.TextSize = 18
+CopyButton.Text = "Copy"
+CopyButton.Parent = MainFrame
+
+-- Membuat Tombol "Add Coor"
+local AddCoorButton = Instance.new("TextButton")
+AddCoorButton.Size = UDim2.new(0, 80, 0, 40)
+AddCoorButton.Position = UDim2.new(0, 15, 0, 95)
+AddCoorButton.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
+AddCoorButton.BorderSizePixel = 0
+AddCoorButton.TextColor3 = Color3.new(1, 1, 1)
+AddCoorButton.Font = Enum.Font.SourceSansBold
+AddCoorButton.TextSize = 18
+AddCoorButton.Text = "Add Coor"
+AddCoorButton.Parent = MainFrame
+
+-- Membuat Tombol "Clear"
+local ClearButton = Instance.new("TextButton")
+ClearButton.Size = UDim2.new(0, 80, 0, 40)
+ClearButton.Position = UDim2.new(0, 105, 0, 95)
+ClearButton.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
+ClearButton.BorderSizePixel = 0
+ClearButton.TextColor3 = Color3.new(1, 1, 1)
+ClearButton.Font = Enum.Font.SourceSansBold
+ClearButton.TextSize = 18
+ClearButton.Text = "Clear"
+ClearButton.Parent = MainFrame
+
+-- Membuat Textbox untuk logging
+local LoggingTextBox = Instance.new("TextBox")
+LoggingTextBox.Size = UDim2.new(1, -30, 1, -165)
+LoggingTextBox.Position = UDim2.new(0, 15, 0, 150)
+LoggingTextBox.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+LoggingTextBox.BorderSizePixel = 2
+LoggingTextBox.BorderColor3 = Color3.fromRGB(20, 20, 20)
+LoggingTextBox.TextColor3 = Color3.new(1, 1, 1)
+LoggingTextBox.Font = Enum.Font.Code
+LoggingTextBox.TextSize = 14
+LoggingTextBox.Text = ""
+LoggingTextBox.TextWrapped = true
+LoggingTextBox.MultiLine = true
+LoggingTextBox.Parent = MainFrame
+LoggingTextBox.PlaceholderText = "Logging..."
+
+-- ===================================
+-- Fungsi-fungsi Skrip
+-- ===================================
+
+-- Fungsi untuk memulai perekaman
+function StartRecording()
+    if isRecording then return end
+    isRecording = true
+    print("Mulai merekam koordinat...")
+    LoggingTextBox.PlaceholderText = "Merekam..."
+
+    -- Hubungkan fungsi ke loop game (setiap frame)
+    connection = RunService.Stepped:Connect(function()
+        local char = Player.Character
+        if char and char:FindFirstChild("HumanoidRootPart") then
+            local pos = char.HumanoidRootPart.Position
+            local formattedCoor = string.format("%.2f, %.2f, %.2f", pos.X, pos.Y, pos.Z)
+            LoggingTextBox.Text = "Logging...\n" .. formattedCoor
         end
-    end
-    return nearestIdx
+    end)
 end
 
-local function getNearestFrameIndex(frames)
-    local startIdx, dist = 1, math.huge
-    if hrp then
-        local pos = hrp.Position
-        for i,cf in ipairs(frames) do
-            local d = (cf.Position - pos).Magnitude
-            if d < dist then
-                dist = d
-                startIdx = i
-            end
-        end
+-- Fungsi untuk menghentikan perekaman
+function StopRecording()
+    if not isRecording then return end
+    isRecording = false
+    if connection then
+        connection:Disconnect()
+        connection = nil
     end
-    if startIdx >= #frames then
-        startIdx = math.max(1, #frames - 1)
-    end
-    return startIdx
+    print("Perekaman dihentikan.")
+    LoggingTextBox.PlaceholderText = "Logging..."
 end
 
-local function lerpCF(fromCF, toCF)
-    local duration = frameTime / math.max(0.05, playbackRate)
-    local t = 0
-    while t < duration do
-        if not isRunning then break end
-        local dt = task.wait()
-        t += dt
-        local alpha = math.min(t / duration, 1)
-        if hrp and hrp.Parent and hrp:IsDescendantOf(workspace) then
-            hrp.CFrame = fromCF:Lerp(toCF, alpha)
-        end
-    end
-end
-
-local function runRouteOnce()
-    if #routes == 0 then return end
-    if not hrp then refreshHRP() end
-    isRunning = true
-    local idx = getNearestRoute()
-    print("▶ Start CP:", routes[idx][1])
-    local frames = routes[idx][2]
-    if #frames < 2 then isRunning = false return end
-    local startIdx = getNearestFrameIndex(frames)
-    for i = startIdx, #frames - 1 do
-        if not isRunning then break end
-        lerpCF(frames[i], frames[i+1])
-    end
-    isRunning = false
-end
-
-local function runAllRoutes()
-    if #routes == 0 then return end
-    if not hrp then refreshHRP() end
-    isRunning = true
-    local idx = getNearestRoute()
-    print("⏩ Start To End dari:", routes[idx][1])
-    for r = idx, #routes do
-        if not isRunning then break end
-        local frames = routes[r][2]
-        if #frames < 2 then continue end
+-- Fungsi untuk menambahkan koordinat saat ini ke daftar
+function AddCoordinate()
+    local char = Player.Character
+    if char and char:FindFirstChild("HumanoidRootPart") then
+        local pos = char.HumanoidRootPart.Position
+        local formattedCoor = string.format("%.2f, %.2f, %.2f", pos.X, pos.Y, pos.Z)
         
-        local startIdx = getNearestFrameIndex(frames)
-        for i = startIdx, #frames - 1 do
-            if not isRunning then break end
-            lerpCF(frames[i], frames[i+1])
+        table.insert(recordedCoordinates, formattedCoor)
+        
+        -- Perbarui tampilan di Logging
+        LoggingTextBox.Text = "Logging...\n"
+        for _, coor in ipairs(recordedCoordinates) do
+            LoggingTextBox.Text = LoggingTextBox.Text .. coor .. "\n"
         end
+        print("Koordinat ditambahkan: " .. formattedCoor)
     end
-    isRunning = false
 end
 
-local function stopRoute()
-    if isRunning then
-        print("⏹ Stop ditekan")
-    end
-    isRunning = false
+-- Fungsi untuk menghapus semua koordinat
+function ClearCoordinates()
+    recordedCoordinates = {}
+    LoggingTextBox.Text = ""
+    LoggingTextBox.PlaceholderText = "Logging..."
+    print("Log dibersihkan.")
 end
 
-
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "WataXReplay"
-screenGui.ResetOnSpawn = false
-screenGui.Parent = game.CoreGui
-
-local frame = Instance.new("Frame",screenGui)
-frame.Size = UDim2.new(0,280,0,180)
-frame.Position = UDim2.new(0.5,-140,0.5,-90)
-frame.BackgroundColor3 = Color3.fromRGB(35,35,40)
-frame.Active = true
-frame.Draggable = true
-frame.BackgroundTransparency = 0.05
-Instance.new("UICorner", frame).CornerRadius = UDim.new(0,12)
-
-local title = Instance.new("TextLabel",frame)
-title.Size = UDim2.new(1,0,0,32)
-title.Text = "WataX Menu"
-title.BackgroundColor3 = Color3.fromRGB(55,55,65)
-title.TextColor3 = Color3.fromRGB(255,255,255)
-title.Font = Enum.Font.GothamBold
-title.TextScaled = true
-Instance.new("UICorner", title).CornerRadius = UDim.new(0,12)
-
-local startCP = Instance.new("TextButton",frame)
-startCP.Size = UDim2.new(0.5,-7,0,42)
-startCP.Position = UDim2.new(0,5,0,44)
-startCP.Text = "Start CP"
-startCP.BackgroundColor3 = Color3.fromRGB(60,200,80)
-startCP.TextColor3 = Color3.fromRGB(255,255,255)
-startCP.Font = Enum.Font.GothamBold
-startCP.TextScaled = true
-Instance.new("UICorner", startCP).CornerRadius = UDim.new(0,10)
-startCP.MouseButton1Click:Connect(runRouteOnce)
-
-local stopBtn = Instance.new("TextButton",frame)
-stopBtn.Size = UDim2.new(0.5,-7,0,42)
-stopBtn.Position = UDim2.new(0.5,2,0,44)
-stopBtn.Text = "Stop"
-stopBtn.BackgroundColor3 = Color3.fromRGB(220,70,70)
-stopBtn.TextColor3 = Color3.fromRGB(255,255,255)
-stopBtn.Font = Enum.Font.GothamBold
-stopBtn.TextScaled = true
-Instance.new("UICorner", stopBtn).CornerRadius = UDim.new(0,10)
-stopBtn.MouseButton1Click:Connect(stopRoute)
-
-local startAll = Instance.new("TextButton",frame)
-startAll.Size = UDim2.new(1,-10,0,42)
-startAll.Position = UDim2.new(0,5,0,96)
-startAll.Text = "Start To End"
-startAll.BackgroundColor3 = Color3.fromRGB(70,120,220)
-startAll.TextColor3 = Color3.fromRGB(255,255,255)
-startAll.Font = Enum.Font.GothamBold
-startAll.TextScaled = true
-Instance.new("UICorner", startAll).CornerRadius = UDim.new(0,10)
-startAll.MouseButton1Click:Connect(runAllRoutes)
-
-
-local closeBtn = Instance.new("TextButton", frame)
-closeBtn.Size = UDim2.new(0,30,0,30)
-closeBtn.Position = UDim2.new(0,0,0,0)
-closeBtn.Text = "✖"
-closeBtn.BackgroundColor3 = Color3.fromRGB(220,60,60)
-closeBtn.TextColor3 = Color3.fromRGB(255,255,255)
-closeBtn.Font = Enum.Font.GothamBold
-closeBtn.TextScaled = true
-Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0,8)
-closeBtn.MouseButton1Click:Connect(function()
-    if screenGui then screenGui:Destroy() end
-end)
-
-
-local miniBtn = Instance.new("TextButton", frame)
-miniBtn.Size = UDim2.new(0,30,0,30)
-miniBtn.Position = UDim2.new(1,-30,0,0)
-miniBtn.Text = "—"
-miniBtn.BackgroundColor3 = Color3.fromRGB(80,80,200)
-miniBtn.TextColor3 = Color3.fromRGB(255,255,255)
-miniBtn.Font = Enum.Font.GothamBold
-miniBtn.TextScaled = true
-Instance.new("UICorner", miniBtn).CornerRadius = UDim.new(0,8)
-
-local bubbleBtn = Instance.new("TextButton", screenGui)
-bubbleBtn.Size = UDim2.new(0,80,0,46)
-bubbleBtn.Position = UDim2.new(0,20,0.7,0)
-bubbleBtn.Text = "WataX"
-bubbleBtn.BackgroundColor3 = Color3.fromRGB(0,140,220)
-bubbleBtn.TextColor3 = Color3.fromRGB(255,255,255)
-bubbleBtn.Font = Enum.Font.GothamBold
-bubbleBtn.TextScaled = true
-bubbleBtn.Visible = false
-bubbleBtn.Active = true
-bubbleBtn.Draggable = true
-Instance.new("UICorner", bubbleBtn).CornerRadius = UDim.new(0,14)
-
-miniBtn.MouseButton1Click:Connect(function()
-    frame.Visible = false
-    bubbleBtn.Visible = true
-end)
-bubbleBtn.MouseButton1Click:Connect(function()
-    frame.Visible = true
-    bubbleBtn.Visible = false
-end)
-
-
-local discordBtn = Instance.new("TextButton", frame)
-discordBtn.Size = UDim2.new(0,100,0,30)
-discordBtn.AnchorPoint = Vector2.new(0,1)
-discordBtn.Position = UDim2.new(0,5,1,-5)
-discordBtn.Text = "Discord"
-discordBtn.BackgroundColor3 = Color3.fromRGB(90,90,220)
-discordBtn.TextColor3 = Color3.fromRGB(255,255,255)
-discordBtn.Font = Enum.Font.GothamBold
-discordBtn.TextScaled = true
-Instance.new("UICorner", discordBtn).CornerRadius = UDim.new(0,8)
-
-
-discordBtn.Size = UDim2.new(0,100,0,30)
-discordBtn.AnchorPoint = Vector2.new(0,1)
-discordBtn.Position = UDim2.new(0,5,1,-5)
-
-local speedRow = Instance.new("Frame", frame)
-speedRow.Size = UDim2.new(0,160,0,30)
-speedRow.AnchorPoint = Vector2.new(0,1)
-speedRow.Position = UDim2.new(0,110,1,-5)
-speedRow.BackgroundTransparency = 1
-
-local speedValue = Instance.new("TextLabel", speedRow)
-speedValue.Size = UDim2.new(0,60,1,0)
-speedValue.Position = UDim2.new(0,0,0,0)
-speedValue.BackgroundTransparency = 1
-speedValue.TextColor3 = Color3.fromRGB(220,220,220)
-speedValue.Font = Enum.Font.GothamBold
-speedValue.TextScaled = true
-speedValue.Text = string.format("%.2fx", playbackRate)
-
-local speedDown = Instance.new("TextButton", speedRow)
-speedDown.Size = UDim2.new(0,40,1,0)
-speedDown.Position = UDim2.new(0,65,0,0)
-speedDown.Text = "–"
-speedDown.BackgroundColor3 = Color3.fromRGB(60,60,100)
-speedDown.TextColor3 = Color3.fromRGB(255,255,255)
-Instance.new("UICorner", speedDown).CornerRadius = UDim.new(0,8)
-
-local speedUp = Instance.new("TextButton", speedRow)
-speedUp.Size = UDim2.new(0,40,1,0)
-speedUp.Position = UDim2.new(0,110,0,0)
-speedUp.Text = "+"
-speedUp.BackgroundColor3 = Color3.fromRGB(60,60,100)
-speedUp.TextColor3 = Color3.fromRGB(255,255,255)
-Instance.new("UICorner", speedUp).CornerRadius = UDim.new(0,8)
-
-speedDown.MouseButton1Click:Connect(function()
-    playbackRate = math.max(0.25, playbackRate - 0.25)
-    if speedValue and speedValue:IsDescendantOf(game) then
-        speedValue.Text = string.format("%.2fx", playbackRate)
+-- Fungsi untuk menyalin koordinat ke clipboard
+function CopyCoordinates()
+    local textToCopy = ""
+    for _, coor in ipairs(recordedCoordinates) do
+        textToCopy = textToCopy .. coor .. "\n"
+    CopyButton.Text = "Copied!"
+    task.delay(1, function() CopyButton.Text = "Copy" end)
+    
     end
-end)
-speedUp.MouseButton1Click:Connect(function()
-    playbackRate = math.min(3, playbackRate + 0.25)
-    if speedValue and speedValue:IsDescendantOf(game) then
-        speedValue.Text = string.format("%.2fx", playbackRate)
-    end
-end)
 
-discordBtn.MouseButton1Click:Connect(function()
-    if setclipboard then
-        setclipboard("https://discord.gg/tfNqRQsqHK")
-    end
-end)
+    -- Executor biasanya menyediakan fungsi `setclipboard` atau `writeclipboard`
+    -- Coba beberapa nama fungsi yang umum
+    local success = pcall(function()
+        getfenv().setclipboard(textToCopy)
+    end)
 
+    if not success then
+        success = pcall(function()
+            getfenv().writeclipboard(textToCopy)
+        end)
+    end
+
+    if success then
+        print("Koordinat berhasil disalin ke clipboard.")
+    else
+        warn("Gagal menyalin ke clipboard. Fungsi clipboard mungkin tidak didukung oleh executor ini.")
+        print("Salin manual dari konsol:")
+        print(textToCopy)
+    end
+end
+
+-- Fungsi untuk menutup GUI
+function CloseGui()
+    StopRecording()
+    ScriptMakerGui:Destroy()
+end
+
+-- Menghubungkan tombol ke fungsinya
+StartButton.MouseButton1Click:Connect(StartRecording)
+StopButton.MouseButton1Click:Connect(StopRecording)
+AddCoorButton.MouseButton1Click:Connect(AddCoordinate)
+ClearButton.MouseButton1Click:Connect(ClearCoordinates)
+CopyButton.MouseButton1Click:Connect(CopyCoordinates)
+CloseButton.MouseButton1Click:Connect(CloseGui)
+
+print("Skrip 'Script Maker V1' telah dijalankan. GUI muncul di layar Anda.")
