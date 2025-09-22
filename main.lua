@@ -20,57 +20,57 @@ local routes = {}
 local CP1 = {
     CFrame.new(44.75, 162.12, -913.11) * CFrame.Angles(0,0,0),
     CFrame.new(45.37, 162.12, -912.86) * CFrame.Angles(0,0,0),
-    CFrame.new(46.61, 162.12, -912.26) * CFrame.Angles(0,0,0)
+    CFrame.new(46.61, 162.12, -912.26) * CFrame.Angles(0,0,0),
 }
 local CP2 = {
     CFrame.new(818.68, 285.01, -578.16) * CFrame.Angles(0,0,0),
     CFrame.new(818.09, 285.01, -577.90) * CFrame.Angles(0,0,0),
-    CFrame.new(815.55, 285.01, -577.97) * CFrame.Angles(0,0,0)
+    CFrame.new(815.55, 285.01, -577.97) * CFrame.Angles(0,0,0),
 }
 local CP3 = {
     CFrame.new(775.52, 516.36, -383.97) * CFrame.Angles(0,0,0),
     CFrame.new(774.10, 516.65, -382.12) * CFrame.Angles(0,0,0),
-    CFrame.new(771.53, 516.99, -379.69) * CFrame.Angles(0,0,0)
+    CFrame.new(771.53, 516.99, -379.69) * CFrame.Angles(0,0,0),
 }
 local CP4 = {
     CFrame.new(518.53, 473.01, -13.53) * CFrame.Angles(0,0,0),
     CFrame.new(157.25, 473.01, -12.87) * CFrame.Angles(0,0,0),
-    CFrame.new(155.26, 473.01, -11.87) * CFrame.Angles(0,0,0)
+    CFrame.new(155.26, 473.01, -11.87) * CFrame.Angles(0,0,0),
 }
 local CP5 = {
     CFrame.new(-81.34, 472.99, 382.37) * CFrame.Angles(0,0,0),
     CFrame.new(-79.82, 472.94, 384.10) * CFrame.Angles(0,0,0),
-    CFrame.new(-78.47, 472.81, 385.37) * CFrame.Angles(0,0,0)
+    CFrame.new(-78.47, 472.81, 385.37) * CFrame.Angles(0,0,0),
 }
 local CP6 = {    
     CFrame.new(175.79, 581.01, 704.89) * CFrame.Angles(0,0,0),
     CFrame.new(176.95, 581.01, 705.63) * CFrame.Angles(0,0,0),
-    CFrame.new(178.09, 581.01, 707.04) * CFrame.Angles(0,0,0)
+    CFrame.new(178.09, 581.01, 707.04) * CFrame.Angles(0,0,0),
 }   
 local CP7 = { 
     CFrame.new(337.61, 584.74, 824.27) * CFrame.Angles(0,0,0),
     CFrame.new(337.30, 584.87, 822.36) * CFrame.Angles(0,0,0),
-    CFrame.new(337.23, 584.91, 821.28) * CFrame.Angles(0,0,0)
+    CFrame.new(337.23, 584.91, 821.28) * CFrame.Angles(0,0,0),
 }
 local CP8 = {    
     CFrame.new(578.96, 669.01, 740.80) * CFrame.Angles(0,0,0),
     CFrame.new(580.06, 669.01, 738.78) * CFrame.Angles(0,0,0),
-    CFrame.new(580.81, 669.01, 737.46) * CFrame.Angles(0,0,0)
+    CFrame.new(580.81, 669.01, 737.46) * CFrame.Angles(0,0,0),
 }
 local CP9 = {
     CFrame.new(1012.99, 709.01, 944.67) * CFrame.Angles(0,0,0),
     CFrame.new(1011.26, 709.01, 944.04) * CFrame.Angles(0,0,0),
-    CFrame.new(1009.26, 709.01, 942.96) * CFrame.Angles(0,0,0)
+    CFrame.new(1009.26, 709.01, 942.96) * CFrame.Angles(0,0,0),
 }
 local CP10 = {
     CFrame.new(793.18, 809.01, 628.98) * CFrame.Angles(0,0,0),
     CFrame.new(793.07, 809.01, 627.38) * CFrame.Angles(0,0,0),
-    CFrame.new(793.50, 809.01, 625.92) * CFrame.Angles(0,0,0)
+    CFrame.new(793.50, 809.01, 625.92) * CFrame.Angles(0,0,0),
 }
 local PUNCAK = {
     CFrame.new(912.03, 998.42, 608.00) * CFrame.Angles(0,0,0),
     CFrame.new(912.59, 998.60, 608.01) * CFrame.Angles(0,0,0),
-    CFrame.new(914.50, 999.01, 607.95) * CFrame.Angles(0,0,0)
+    CFrame.new(914.50, 999.01, 607.95) * CFrame.Angles(0,0,0),
 }
 
 routes = {
