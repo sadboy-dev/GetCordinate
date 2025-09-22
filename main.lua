@@ -74,18 +74,17 @@ local PUNCAK = {
 }
 
 routes = {
-    {"CP0 → CP1", CP0to1},
-    {"CP1 → CP2", CP1},
-    {"CP2 → CP3", CP2},
-    {"CP3 → CP4", CP3},
-    {"CP4 → CP5", CP4},
-    {"CP5 → CP6", CP5},
-    {"CP6 → CP7", CP6},
-    {"CP7 → CP8", CP7},
-    {"CP8 → CP9", CP8},
-    {"CP9 → CP10", CP9},
-    {"CP10 → PUNCAK", CP10},
-    {"PUNCAK → END", PUNCAK}
+    {"CP0 → CP1", CP1},
+    {"CP1 → CP2", CP2},
+    {"CP2 → CP3", CP3},
+    {"CP3 → CP4", CP4},
+    {"CP4 → CP5", CP5},
+    {"CP5 → CP6", CP6},
+    {"CP6 → CP7", CP7},
+    {"CP7 → CP8", CP8},
+    {"CP8 → CP9", CP9},
+    {"CP9 → CP10", CP10},
+    {"CP10 → PUNCAK", PUNCAK}
 }
 
 local function getNearestRoute()
