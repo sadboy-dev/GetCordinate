@@ -21,7 +21,8 @@ local CP0to1 = {
     CFrame.new(-527.43, 740.91, 210.28) * CFrame.Angles(0,0,0),
     CFrame.new(-564.59, 740.06, 210.91) * CFrame.Angles(0,0,0),
     CFrame.new(-579.43, 740.70, 209.58) * CFrame.Angles(0,0,0),
-    CFrame.new(-595.98, 741.01, 211.04) * CFrame.Angles(0,0,0)
+    CFrame.new(-595.98, 741.01, 211.04) * CFrame.Angles(0,0,0),
+    CFrame.new(-588.87, 741.01, 209.73) * CFrame.Angles(0,0,0)
 }
 
 routes = {
