@@ -20,10 +20,7 @@ local routes = {}
 local CP1 = {
     CFrame.new(631.62, 1798.71, 3432.92) * CFrame.Angles(0,0,0),
     CFrame.new(629.26, 1798.88, 3433.54) * CFrame.Angles(0,0,0),
-    CFrame.new(627.34, 1799.47, 3433.59) * CFrame.Angles(0,0,0),
-    CFrame.new(802.49, 2144.06, 3911.50) * CFrame.Angles(0,0,0),
-    CFrame.new(803.20, 2151.44, 3917.96) * CFrame.Angles(0,0,0),
-    CFrame.new(801.32, 2154.88, 3921.03) * CFrame.Angles(0,0,0)
+    CFrame.new(627.34, 1799.47, 3433.59) * CFrame.Angles(0,0,0)
 }
 
 routes = {
