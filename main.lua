@@ -44,9 +44,9 @@ local routes: RouteData[] = {}
 
 -- Rute CP1: Kumpulan CFrame waypoints
 local CP1 = {
-    CFrame.new(631.62, 1798.71, 3432.92) * CFrame.Angles(0,0,0),
-    CFrame.new(629.26, 1798.88, 3433.54) * CFrame.Angles(0,0,0),
-    CFrame.new(627.34, 1799.47, 3433.59) * CFrame.Angles(0,0,0)
+    CFrame.new(-5544.76, 645.73, -1089.08) * CFrame.Angles(0,0,0),
+    CFrame.new(-5545.52, 645.73, -1089.21) * CFrame.Angles(0,0,0),
+    CFrame.new(-5547.23, 645.73, -1089.44) * CFrame.Angles(0,0,0)
 }
 
 -- Mengisi tabel rute
