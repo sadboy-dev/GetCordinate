@@ -17,6 +17,10 @@ local frameTime = 1/30
 local playbackRate = 1
 local isReplayRunning = false
 
+-- Variabel baru untuk delay
+local DELAY_FRAMES = 3 -- Jeda setiap 3 CFrame
+local DELAY_TIME = 1 -- Durasi jeda dalam detik (Anda bisa ubah ini)
+
 
 for i, link in ipairs(ROUTE_LINKS) do
     if link ~= "" then
@@ -187,10 +191,24 @@ local function runRoute()
     local frames = routes[idx][2]
     if #frames<2 then isReplayRunning=false return end
     local startIdx = getNearestFrameIndex(frames)
+    
+    local frameCounter = 0 -- Penghitung frame/CFrame baru
+    
     for i=startIdx,#frames-1 do
         if not isReplayRunning then break end
+        
+        -- Lakukan interpolasi (pergerakan)
         lerpCF(frames[i],frames[i+1])
+        
+        -- Tambahkan delay setelah setiap X frame
+        frameCounter = frameCounter + 1
+        if frameCounter % DELAY_FRAMES == 0 then
+            if isReplayRunning then -- Pastikan masih berjalan sebelum jeda
+                task.wait(DELAY_TIME)
+            end
+        end
     end
+    
     isReplayRunning=false
     stopMovement()
 end
@@ -295,10 +313,12 @@ toggleBtn.MouseButton1Click:Connect(function()
     if not isRunning then
         isRunning = true
         toggleBtn.Text = "■ Stop"
+        toggleBtn.BackgroundColor3 = Color3.fromRGB(200,70,70) -- Perubahan warna
         task.spawn(runRoute)
     else
         isRunning = false
         toggleBtn.Text = "▶ Start"
+        toggleBtn.BackgroundColor3 = Color3.fromRGB(70,200,120) -- Perubahan warna
         stopRoute()
     end
 end)
