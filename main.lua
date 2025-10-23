@@ -6,7 +6,7 @@ local hrp
 
 
 local ROUTE_LINKS = {
-    "https://raw.githubusercontent.com/sadboy-dev/GetCordinate/refs/heads/main/mika.lua",
+    "https://raw.githubusercontent.com/sadboy-dev/GetCordinate/refs/heads/main/mulu.lua",
 }
 
 
